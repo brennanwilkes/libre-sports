@@ -1,0 +1,26 @@
+{
+    "name": "piratesports",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build:production": "sed -i 's/development/production/' ./webpack.config.js ; npm run build ; sed -i 's/production/development/' ./webpack.config.js ;",
+        "build": "webpack --config ./webpack.config.js",
+        "watch": "webpack --config ./webpack.config.js --watch"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@babel/core": "^7.14.3",
+        "@babel/preset-env": "^7.14.4",
+        "axios": "^0.21.1",
+        "babel-loader": "^8.2.2",
+        "form-data": "^4.0.0",
+        "node-html-parser": "^3.3.4"
+    },
+    "devDependencies": {
+        "webpack": "^5.38.1",
+        "webpack-cli": "^4.7.0"
+    }
+}
