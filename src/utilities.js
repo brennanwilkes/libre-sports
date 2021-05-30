@@ -1,6 +1,6 @@
 const axios = require("axios");
-const HTMLParser = require('node-html-parser');
-const FormData = require('form-data');
+const HTMLParser = require("node-html-parser");
+const FormData = require("form-data");
 
 const baseURL = "http://cricfree.sc/";
 
@@ -55,8 +55,8 @@ const getEventStream = (event) => {
 		form.append("scheduleid", event[1]);
 		axios.post(event[0], form, {
 			headers: {
-				...form.getHeaders(),
-			},
+				...form.getHeaders()
+			}
 		}).then(res => {
 			Promise.all(getAllMatches(res.data.split("<body>")[1], /(http[^"]+\.live[^"]*)/g).map(getDeepURL)).then(resolve).catch(reject);
 		}).catch(reject);
@@ -65,7 +65,7 @@ const getEventStream = (event) => {
 
 const formatEventName = event => event.split("-").filter(word => !new RegExp(/(live|streami?n?g?|cricfree)/, "i").test(word)).map(word => word.length > 3 ? word.charAt(0).toUpperCase() + word.slice(1) : word ).join(" ");
 
-const getEventsAndStreams = () => {
+exports.getEventsAndStreams = () => {
 	return new Promise((resolve, reject) => {
 		getEvents().then(events => {
 			Promise.all(events.map((event, i) => {
@@ -86,5 +86,3 @@ const getEventsAndStreams = () => {
 		}).catch(reject);
 	});
 }
-
-getEventsAndStreams().then(streams => console.dir(streams.filter(s => s.streams.length > 0))).catch(console.error);

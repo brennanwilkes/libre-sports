@@ -2,7 +2,7 @@ const path = require("path");
 module.exports = {
 	mode: "development",
 	devtool: "source-map",
-	entry: "./index.js",
+	entry: "./src/index.js",
 	output: {
 		filename: "bundle.js",
 		path: path.resolve(__dirname, "dist")
@@ -22,5 +22,9 @@ module.exports = {
 	},
 	resolve: {
 		extensions: [".js"]
+	},
+	watchOptions: {
+		poll: true,
+		ignored: /node_modules/
 	}
 };
