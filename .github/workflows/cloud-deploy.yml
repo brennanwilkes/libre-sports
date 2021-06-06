@@ -35,4 +35,4 @@ jobs:
           run: docker push $IMAGE_NAME
 
         - name: Deploy Docker image
-          run: gcloud run deploy libre-sports --image $IMAGE_NAME --region us-central1 --platform managed
+          run: gcloud run deploy libre-sports --image $IMAGE_NAME --region us-central1 --platform managed --region us-west1 --allow-unauthenticated --cpu 1 --memory 256M --max-instances 4
