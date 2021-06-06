@@ -18,7 +18,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@main
         with:
           service: libre-sports
-          image: gcr.io/cloudrun/libre-sports
+          image: gcr.io/${{ secrets.CLOUD_PROJECT }}/libre-sports
           region: us-west1
           credentials: ${{ secrets.GCP_SA_KEY }}
       - name: Use Output
