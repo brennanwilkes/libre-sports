@@ -1,4 +1,4 @@
-name: Cloud Deploy
+name: Docker
 
 on:
   push:
@@ -7,19 +7,35 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x]
-    steps:
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@main
-        with:
-          service: libre-sports
-          image: gcr.io/${{ secrets.CLOUD_PROJECT }}/libre-sports
-          region: us-west1
-          credentials: ${{ secrets.GCP_SA_KEY }}
-      - name: Use Output
-        run: curl "${{ steps.deploy.outputs.url }}"
+
+    deploy:
+
+        name: Setup Gcloud Account
+        runs-on: ubuntu-latest
+        env:
+          IMAGE_NAME: gcr.io/${{ secrets.CLOUD_PROJECT }}/libre-sports
+        steps:
+
+        - name: Login
+          uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+          with:
+            project_id: ${{ secrets.CLOUD_PROJECT }}
+            service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+        - name: Configure Docker
+          run: gcloud auth configure-docker --quiet
+
+        - name: Checkout repository
+          uses: actions/checkout@v2
+
+        - name: Build Docker image
+          run: docker build . -t $IMAGE_NAME
+
+        - name: Test Docker image
+          run: docker run $IMAGE_NAME sh -c "go test -v"
+
+        - name: Push Docker image
+          run: docker push $IMAGE_NAME
+
+        - name: Deploy Docker image
+          run: gcloud run deploy ${{ secrets.CLOUD_PROJECT }} --image $IMAGE_NAME --region us-central1 --platform managed
