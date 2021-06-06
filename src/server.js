@@ -17,11 +17,13 @@ app.get("/streams", (req, res) => {
 		});
 	});
 });
+
 app.get("/", (req, res) => {
 	res.sendFile("public/index.html", {
 		root: `${__dirname}/../`
 	});
 });
+
 app.get("/bundle.js", (req, res) => {
 	res.sendFile("dist/bundle.js", {
 		root: `${__dirname}/../`
