@@ -23,8 +23,13 @@ const getDeepURL = (url, previousURL) => {
 			const iframe = root.querySelector("iframe");
 			if(iframe){
 				let deeperURL = getSrc(iframe.rawAttrs);
-				if(previousURL && !(new RegExp(/^http/).test(deeperURL))){
-					deeperURL = `${previousURL.split('/').slice(0,-1).join('/')}/${deeperURL.replace(/^\//, "")}`;
+				if(!(new RegExp(/^http/).test(deeperURL))){
+					if(deeperURL[0] === "/"){
+						deeperURL = `${url.replace(/(https?:\/\/[^.]+\.[^/]+).*/, (m, $1) => $1)}${deeperURL}`;
+					}
+					else{
+						deeperURL = `${url.split('/').slice(0,-1).join('/')}/${deeperURL.replace(/^\//, "")}`;
+					}
 				}
 
 				if(["worlwidestream.net", "wigistream.to", "www.wmsxx.com"].reduce((cur, next) => cur || deeperURL.includes(next), false)){
