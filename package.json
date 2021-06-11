@@ -8,7 +8,8 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "build:production": "sed -i 's/development/production/' ./webpack.config.js ; npm run build ; sed -i 's/production/development/' ./webpack.config.js ;",
         "build": "webpack --config ./webpack.config.js",
-        "watch": "webpack --config ./webpack.config.js --watch"
+        "watch": "webpack --config ./webpack.config.js --watch",
+        "dev": "nodemon src/server.js"
     },
     "author": "",
     "license": "ISC",
@@ -22,9 +23,11 @@
         "form-data": "^4.0.0",
         "node-html-parser": "^3.3.4",
         "react": "^17.0.2",
+        "react-bootstrap-floating-label": "^1.5.0",
         "react-dom": "^17.0.2"
     },
     "devDependencies": {
+        "nodemon": "^2.0.7",
         "webpack": "^5.38.1",
         "webpack-cli": "^4.7.0"
     }

@@ -1,13 +1,16 @@
 
-const getEventsAndStreams = require("./utilities.js").getEventsAndStreams;
+const util = require("./utilities.js");
+const getEvents = util.getEvents;
+const streamsFromEvents = util.streamsFromEvents;
+
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.get("/streams", (req, res) => {
-	getEventsAndStreams().then(events => {
+app.get("/events", (req, res) => {
+	getEvents().then(events => {
 		res.status(200).json({
-			events: events.filter(e => e.streams.length > 0),
+			events: events,
 			errors: []
 		});
 	}).catch(err => {
@@ -16,6 +19,39 @@ app.get("/streams", (req, res) => {
 			errors: [err]
 		});
 	});
+});
+
+app.get("/streams", (req, res) => {
+	const url = req.query.url;
+	const id = req.query.id;
+
+	if(!url || !id){
+		res.status(400).send({
+			events: [],
+			errors: [{
+				message: "Invalid query params",
+				status: 400
+			}]
+		});
+	}
+	else{
+		streamsFromEvents([
+			[
+				url,
+				id
+			]
+		]).then(events => {
+			res.status(200).json({
+				events: events.filter(e => e.streams.length > 0),
+				errors: []
+			});
+		}).catch(err => {
+			res.status(500).send({
+				events: [],
+				errors: [err]
+			});
+		});
+	}
 });
 
 app.get("/", (req, res) => {
@@ -32,5 +68,5 @@ app.get("/bundle.js", (req, res) => {
 
 
 app.listen(port, () => {
-	console.log(`Example app listening at http://localhost:${port}`)
+	console.log(`App listening at http://localhost:${port}`)
 })

@@ -1,6 +1,8 @@
 import axios from "axios";
 import React from "react";
 import ReactDOM from "react-dom";
+import FloatingLabel from "react-bootstrap-floating-label";
+
 
 class App extends React.Component {
 
@@ -8,23 +10,42 @@ class App extends React.Component {
 		super(props);
 		this.state = {
 			preview: undefined,
-			events: []
+			events: [],
+			eventsFiltered: [],
+			queryText: ""
 		}
 	}
 
 	componentDidMount(){
-		axios.get("/streams").then(data => {
+		axios.get("/events").then(data => {
 			this.setState({
-				events: data.data.events
+				events: data.data.events,
+				eventsFiltered: data.data.events
 			});
 		}).catch(alert);
 	}
 
+	componentDidUpdate(prevProps, prevState){
+		if(prevState.eventsFiltered !== this.state.eventsFiltered){
+			this.state.eventsFiltered.filter(e => e[0].toLowerCase().includes(this.state.queryText.toLowerCase())).forEach((event, i) => {
+				axios.get(`/streams?url=${encodeURIComponent(event[0])}&id=${encodeURIComponent(event[1])}`).then(data => {
+					const obj = {};
+					obj[data.data.events[0].name] = data.data.events[0];
+					this.setState(obj);
+				}).catch(console.error);
+			});
+		}
+	}
+
 	render(){
+
+		let streams = Object.keys(this.state).filter(key => key !== "events" && key !== "preview" && key !== "eventsFiltered" && key !== "queryText").map(key => this.state[key]);
+		streams = streams.filter(stream => stream.name.toLowerCase().includes(this.state.queryText.toLowerCase()));
+
 		return <>
 			<div className="container-fluid d-flex align-items-center flex-column justify-content-center p-4">
 				{
-					this.state.events.length > 0
+					streams.length > 0
 					? <>
 						<div className="my-3 d-flex align-items-center justify-content-center" style={{
 							width: "50vw",
@@ -38,11 +59,25 @@ class App extends React.Component {
 					: <></>
 				}
 				<h1 className="font-weight-bold">Events</h1>
-				{
-					this.state.events.length === 0
+				<FloatingLabel
+					label="Filter"
+					style={{
+						width: "50vw"
+					}}
+					id="filter"
+					onChange={event => {
+						this.setState({
+							eventsFiltered: this.state.events.filter(e => e[0].toLowerCase().includes(event.target.value.toLowerCase())),
+							queryText: event.target.value
+						});
+					}}
+					onChangeDelay={200}
+				/>{
+					streams.length === 0
 					? <h4>Loading...</h4>
-					: <><div>{
-						this.state.events.map(event => <>
+					: <>
+					<div>{
+						streams.map(event => <>
 							<div className="my-3 col-12 d-flex flex-column align-items-center justify-content-center">
 								<h3>{event.name}</h3>
 								<div className="d-flex align-items-center justify-content-center">{

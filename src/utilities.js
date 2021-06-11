@@ -63,31 +63,33 @@ const getEventStream = (event) => {
 				...form.getHeaders()
 			}
 		}).then(res => {
-			Promise.all(getAllMatches(res.data.split("<body>")[1], /(http[^"]+\.live[^"]*)/g).map(getDeepURL)).then(resolve).catch(reject);
+			Promise.all(getAllMatches(res.data.split("<body>")[1], /(http[^"]+\.live[^"]*)/g).map(async url => {
+				const deepUrl = await getDeepURL(url).catch(()=>{});
+				return deepUrl;
+			})).then(data => resolve(data.filter(url => !!url))).catch(reject);
 		}).catch(reject);
 	})
 }
 
 const formatEventName = event => event.split("-").filter(word => !new RegExp(/(live|streami?n?g?|cricfree)/, "i").test(word)).map(word => word.length > 3 ? word.charAt(0).toUpperCase() + word.slice(1) : word ).join(" ");
 
-exports.getEventsAndStreams = () => {
+exports.getEvents = getEvents;
+exports.streamsFromEvents = (events) => {
 	return new Promise((resolve, reject) => {
-		getEvents().then(events => {
-			Promise.all(events.map((event, i) => {
-				return new Promise((resolve2, reject2) => {
-					getEventStream(event).then(streams => {
-						resolve2({
-							name: formatEventName(event[0].split("/").splice(-1)[0]),
-							streams
-						});
-					}).catch(err => {
-						resolve2({
-							name: formatEventName(event[0].split("/").splice(-1)[0]),
-							streams: []
-						});
+		Promise.all(events.map((event, i) => {
+			return new Promise((resolve2, reject2) => {
+				getEventStream(event).then(streams => {
+					resolve2({
+						name: formatEventName(event[0].split("/").splice(-1)[0]),
+						streams
+					});
+				}).catch(err => {
+					resolve2({
+						name: formatEventName(event[0].split("/").splice(-1)[0]),
+						streams: []
 					});
 				});
-			})).then(resolve).catch(reject);
-		}).catch(reject);
+			});
+		})).then(resolve).catch(reject);
 	});
-}
+};
