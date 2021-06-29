@@ -40,7 +40,7 @@ const getDeepURL = (url, previousURL) => {
 				}
 			}
 			else{
-				if(resp.data.includes(/This Channel is deleted./ig)){
+				if((resp.data.replace(/\s/g, "") === "ThisChannelisdeleted."){
 					resolve(previousURL);
 				}
 				else{
