@@ -40,7 +40,7 @@ const getDeepURL = (url, previousURL) => {
 				}
 			}
 			else{
-				if((resp.data.replace(/\s/g, "") === "ThisChannelisdeleted."){
+				if(resp.data.replace(/\s/g, "") === "ThisChannelisdeleted."){
 					resolve(previousURL);
 				}
 				else{
